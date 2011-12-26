@@ -1,0 +1,167 @@
+<!-- build.xml for template project -->
+
+
+<project name="verba" default="compile" basedir=".">
+    <description>
+        Verba: a Latin-English Lexicon based on the 'Elementary Latin Dictionary' by Charleton Lewis and morphological analysis by the Tufts Perseus Project.
+    </description>
+
+    <property name="project.version" value="1.0.0-SNAPSHOT" />
+
+    <!-- global properties -->
+    <property name="java.src.dir"       value="src" />
+    <property name="test.src.dir"       value="test" />
+    <property name="dist.dir"           value="dist" />
+    <property name="java.classes.dir"   value="${dist.dir}/classes" />
+    <property name="test.classes.dir"   value="${dist.dir}/test" />
+    <property name="report.dir"         value="test-results" />
+    <property name="generated.dir"      value="generated"/>
+    <property name="default.installation.dir"   value="verba-installation" />
+    <property name="installation.dir"   value="${default.installation.dir}" />
+    <property name="lib.dir"            value="lib" />
+    <property name="scripts.dir"        value="scripts" />
+
+    <!-- classpath -->
+    <path id="classpath">
+        <fileset dir="${lib.dir}"           includes="*.jar"/>
+        <fileset dir="${java.classes.dir}"  includes="**/*.class" />
+        <fileset dir="${test.classes.dir}"  includes="**/*.class" />
+    </path>
+
+    <path id="classpath.test">
+        <path path="${java.classes.dir}" />
+        <path path="${test.classes.dir}" />
+    </path>
+    
+    <path id="generate-classpath">
+        <fileset dir="${dist.dir}" includes="*.jar" />
+    </path>
+    
+    <path id="run-classpath">
+        <fileset dir="${installation.dir}" includes="*.jar" />
+    </path>
+
+    <!-- targets -->
+
+    <target name="init" depends="clean">
+        <tstamp />
+        <mkdir dir="${java.classes.dir}" />
+        <mkdir dir="${test.classes.dir}" />
+        <mkdir dir="${generated.dir}" />
+        <mkdir dir="${installation.dir}" />
+    </target>
+
+    <target name="clean"
+            description="cleans only the build and report directories.">
+        <echo>Cleaning ${dist.dir}</echo>
+        <delete dir="${dist.dir}" />
+        <delete dir="${report.dir}" />
+        <echo>Deleted ${report.dir}</echo>
+        <echo>Deleted ${examples.dist.dir}</echo>
+        <echo>Deleted ${examples.lib.dir}</echo>
+    </target>
+    
+    <target name="clean-generated"
+            description="cleans only the generated directory which may contain a SQLLite DB and SQL scripts.">
+        <echo>Cleaning ${generated.dir}</echo>
+        <delete dir="${generated.dir}" />
+        <echo>Deleted ${generated.dir}</echo>
+    </target>
+
+    <target name="clean-all"
+            depends="clean, clean-generated"
+            description="cleans everything, including build, generated, and default installation directories.">
+        <delete dir="${default.installation.dir}" />
+        <echo>All clean, now.</echo>
+    </target>
+
+    <target name="compile" depends="init">
+        <echo>Compiling source from ${java.src.dir} to
+            ${java.classes.dir}</echo>
+        <javac srcdir="${java.src.dir}" destdir="${java.classes.dir}" includeantruntime="false" classpathref="classpath"/>
+        <copy todir="${java.classes.dir}">
+            <fileset dir="${java.src.dir}">
+                <exclude name="**/*.java"/>
+                <include name="**/*.xml" />
+                <include name="**/*.sql" />
+                <include name="**/*.txt" />
+            </fileset>
+        </copy>
+    </target>
+
+
+    <target name="compile-test" depends="compile,init">
+        <echo>Compiling unit tests</echo>
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" classpathref="classpath.test" includeantruntime="false"/>
+    </target>
+
+
+    <!-- Packaging tasks -->
+    <target name="package"
+            depends="compile"
+            description="generates the distribution jar">
+        <jar destfile="${dist.dir}/verba-${project.version}.jar"
+             basedir="${java.classes.dir}">
+            <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="org.magnopere.lexicon.Verba"/>
+                <section name="common">
+                    <attribute name="Specification-Title" value="Verba: a Latin-English Lexicon based on the 'Elementary Latin Dictionary' by Charleton Lewis and morphological analysis by the Tufts Perseus Project."/>
+                    <attribute name="Specification-Version" value="${project.version}"/>
+                    <attribute name="Specification-Vendor" value="magnopere.org"/>
+                    <attribute name="Implementation-Title" value="verba"/>
+                    <attribute name="Implementation-Version" value="${project.version} ${TODAY}"/>
+                    <attribute name="Implementation-Vendor" value="magnopere.org"/>
+                </section>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="check-verba-db">
+        <available file="${generated.dir}/verba.db" property="verba-db-exists"/>
+    </target>
+
+    <target name="generate-db"
+            depends="package, check-verba-db"
+            unless="${verba-db-exists}"
+            description="After building the project, this task creates the SQLite DB file which contains the lexical and morphological entries used for lookup and display. If the DB file exists, this target does nothing. WARNING: this is slow and unoptimized.">
+        <java fork="true"
+              jvmargs="-DentityExpansionLimit=10000000 -Xmx1024M"
+              classpathref="generate-classpath"
+              classname="org.magnopere.lexicon.Verba"
+              args="-d ${generated.dir}">
+        </java>
+    </target>
+
+    <target name="generate-sql"
+            depends="package"
+            description="After building the project, this task writes the database contents out to sql scripts which can then be used to populate the SQLLite DB.">
+        <delete file="${generated.dir}/lexicon.sql" />
+        <delete file="${generated.dir}/morphology.sql" />
+        <java fork="true"
+              jvmargs="-DentityExpansionLimit=10000000 -Xmx1024M"
+              classpathref="generate-classpath"
+              classname="org.magnopere.lexicon.Verba"
+              args="-s ${generated.dir}">
+        </java>
+    </target>
+
+    <target name="install"
+            depends="generate-db"
+            description="Copies the distribution to the installation directory, which can be set using '-Dinstallation.dir=/path/to/installation/dir'.">
+        <copy todir="${installation.dir}">
+            <fileset dir="${dist.dir}">
+                <include name="verba-${project.version}.jar" />
+            </fileset>
+            <fileset dir="${generated.dir}">
+                <include name="verba.db" />
+            </fileset>
+            <fileset dir="${scripts.dir}">
+                <include name="verba.sh" />
+            </fileset>
+        </copy>
+        <replace file="${installation.dir}/verba.sh" token="[version]" value="${project.version}"/>
+    </target>
+
+
+</project>
