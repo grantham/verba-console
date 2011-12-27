@@ -8,6 +8,10 @@
 ;;;;
 ;;;;        https://github.com/grantham/verba-console
 ;;;;
+;;;; Pre-built binaries are available from:
+;;;;
+;;;;        http://www.magnopere.org
+;;;;
 ;;;; Welcome to the Verba Latin-English dictionary, based on the public
 ;;;; domain dictionary:
 ;;;;
