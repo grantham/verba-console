@@ -124,7 +124,9 @@
     <target name="generate-db"
             depends="package, check-verba-db"
             unless="${verba-db-exists}"
-            description="After building the project, this task creates the SQLite DB file which contains the lexical and morphological entries used for lookup and display. If the DB file exists, this target does nothing. WARNING: this is slow and unoptimized.">
+            description="After building the project, this task creates the SQLite DB file which contains the lexical
+and morphological entries used for lookup and display. If the DB file exists, this target does nothing.
+WARNING: this is dreadfully slow and unoptimized.">
         <java fork="true"
               jvmargs="-DentityExpansionLimit=10000000 -Xmx1024M"
               classpathref="generate-classpath"
@@ -133,9 +135,22 @@
         </java>
     </target>
 
+    <target name="generate-db-from-sql"
+            depends="check-verba-db, generate-sql"
+            unless="${verba-db-exists}"
+            description="After building the project, this task creates SQL scripts and then then SQLite DB file which
+contains the lexical and morphological entries used for lookup and display. If the DB file exists, this target does
+nothing. Note that this target shells out to sqlite3.">
+        <echo>Importing data into SQLite database file. Please wait.</echo>
+        <exec executable="sqlite3">
+            <arg line="-init sqlite3.init ${generated.dir}/verba.db" />
+        </exec>
+    </target>
+
     <target name="generate-sql"
             depends="package"
-            description="After building the project, this task writes the database contents out to sql scripts which can then be used to populate the SQLLite DB.">
+            description="After building the project, this task writes the database contents out to sql scripts which
+can then be used to populate the SQLLite DB.">
         <delete file="${generated.dir}/lexicon.sql" />
         <delete file="${generated.dir}/morphology.sql" />
         <java fork="true"
@@ -147,8 +162,9 @@
     </target>
 
     <target name="install"
-            depends="generate-db"
-            description="Copies the distribution to the installation directory, which can be set using '-Dinstallation.dir=/path/to/installation/dir'.">
+            depends="generate-db-from-sql"
+            description="Copies the distribution to the installation directory, which can be set using
+'-Dinstallation.dir=/path/to/installation/dir'.">
         <copy todir="${installation.dir}">
             <fileset dir="${dist.dir}">
                 <include name="verba-${project.version}.jar" />
@@ -159,9 +175,9 @@
             <fileset dir="${scripts.dir}">
                 <include name="verba.sh" />
             </fileset>
+            <fileset file="README.md" />
         </copy>
         <replace file="${installation.dir}/verba.sh" token="[version]" value="${project.version}"/>
+        <chmod file="${installation.dir}/verba.sh" perm="a+x"/>
     </target>
-
-
 </project>

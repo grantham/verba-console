@@ -1,0 +1,4 @@
+.echo OFF
+.read ./generated/lexicon.sql
+.read ./generated/morphology.sql
+.quit

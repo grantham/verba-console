@@ -38,41 +38,54 @@ I would prefer to release under the GPL, but since Perseus won't dual-license I'
 [Mozilla Public License (MPL) 1.1](http://www.mozilla.org/MPL/MPL-1.1.html) using a provision (section 13) permitting
 licensing under the GPL. The only files not covered by this license are the two listed above.
 
-## Repository
-The verba-console git repository is available at [https://github.com/grantham/verba-console](https://github.com/grantham/verba-console)
+## Source and pre-built binaries
+_Source_ is available from the verba-console git repository: [https://github.com/grantham/verba-console](https://github.com/grantham/verba-console)
+
+Pre-built _binaries_ are available from [http://www.magnopere.org](http://www.magnopere.org)
 
 ## Prerequisites
-The following must be installed to build and run:
+The following must be installed to run:
 
 - A recent Java (6 or later)
-- [SQLite 3](http://www.sqlite.org/download.html)
+- [SQLite 3](http://www.sqlite.org/download.html) (the `sqlite3` command must be in your system path).
+
+In order to build, you'll need:
+
+- A recent JDK (6 or later)
+- [SQLite 3](http://www.sqlite.org/download.html) (the `sqlite3` command must be in your system path).
+- ant
 
 ## Building
 
 1. call:
 
-        $ ant -D/path/to/installation/dir install
+        $ ant -Dinstallation.dir=/path/to/installation/dir install
 
 This will build the jar, a script to start the application, and the database.
 
 
 ## Installing
 
-Assuming you have already run the ant install target:
+### From source:
+Simply run the ant `install` target, passing in the path to the desired installation directory:
 
-1. `$ cd /path/to/installation/dir`
-2. `$ chmod a+x ./verba.sh`
+        $ ant -Dinstallation.dir=/path/to/installation/dir install
 
-For convenience, add a symlink somewhere in your system path to the verba.sh script.
+### From pre-build binaries
+Download the distribution zip file from [http://www.magnopere.org](http://www.magnopere.org) and unzip in your preferred
+location.
+
+For convenience, either add the `verba.sh` script to your system path or create a script in your system path which
+changes to the verba-console installation directory and invokes the `verba.sh` script.
 
 ## Running
 
-If you did not put a symlink in your path to the verba.sh
+If you did not put a `verba.sh` (or a script which invokes it) in your system path:
 
 1. `$ cd /path/to/installation/dir`
 2. `$ ./verba.sh`
 
-Otherwise, just enter the symlink name you created in the console.
+Otherwise, just enter the script name you created in the console.
 
 When verba starts, simply enter any form of a latin word you wish to look up at the prompt:
 
