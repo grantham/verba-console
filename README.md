@@ -38,11 +38,14 @@ I would prefer to release under the GPL, but since Perseus won't dual-license I'
 [Mozilla Public License (MPL) 1.1](http://www.mozilla.org/MPL/MPL-1.1.html) using a provision (section 13) permitting
 licensing under the GPL. The only files not covered by this license are the two listed above.
 
+## Repository
+The verba-console git repository is available at [https://github.com/grantham/verba-console](https://github.com/grantham/verba-console)
+
 ## Prerequisites
 The following must be installed to build and run:
 
 - A recent Java (6 or later)
-- [SQLite](http://www.sqlite.org/download.html)
+- [SQLite 3](http://www.sqlite.org/download.html)
 
 ## Building
 
@@ -50,7 +53,7 @@ The following must be installed to build and run:
 
         $ ant -D/path/to/installation/dir install
 
-2. go watch a movie, as this will take a great while to complete.
+This will build the jar, a script to start the application, and the database.
 
 
 ## Installing
@@ -58,7 +61,7 @@ The following must be installed to build and run:
 Assuming you have already run the ant install target:
 
 1. `$ cd /path/to/installation/dir`
-2. `$chmod a+x ./verba.sh`
+2. `$ chmod a+x ./verba.sh`
 
 For convenience, add a symlink somewhere in your system path to the verba.sh script.
 

@@ -25,7 +25,8 @@
 -- the provisions above, a recipient may use your version of this file
 -- under either the MPL or the [GPL] License.
 CREATE TABLE morphology
-(form VARCHAR(250),
+(_id INTEGER PRIMARY KEY AUTOINCREMENT,
+ form VARCHAR(250),
  lemma VARCHAR(250),
  grammaticalCase VARCHAR(20) CHECK (grammaticalCase in ("", "abl", "acc", "dat", "gen", "nom", "voc")),
  degree  VARCHAR(20) CHECK (degree in ("", "degree", "comp", "superl")),
@@ -38,7 +39,7 @@ CREATE TABLE morphology
  voice  VARCHAR(20) CHECK (voice in ("", "act", "pass"))
 );
 
-CREATE INDEX form_lemma_index ON morphology (form, lemma);
-CREATE INDEX form_index ON morphology (form);
-CREATE INDEX lemma_index ON morphology (lemma);
+CREATE INDEX morph_form_lemma_index ON morphology (form, lemma);
+CREATE INDEX morph_form_index ON morphology (form);
+CREATE INDEX morph_lemma_index ON morphology (lemma);
 

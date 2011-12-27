@@ -84,7 +84,8 @@ public class DataRepository implements PersistenceStrategy {
             stat.executeUpdate("drop table if exists lexicon;");
             stat.executeUpdate(createLexiconTableScript);
             stat.close();
-            writeLexiconEntry = conn.prepareStatement("insert into lexicon values (?, ?, ?, ?, ?, ?, ?);");
+            writeLexiconEntry = conn.prepareStatement(
+             "insert into lexicon (lemma, ordinality, orthography, endings, gender, pos, definition) values (?, ?, ?, ?, ?, ?, ?);");
         } catch (Exception e){
             throw new RuntimeException(e);
         }
@@ -98,7 +99,8 @@ public class DataRepository implements PersistenceStrategy {
             stat.executeUpdate("drop table if exists morphology;");
             stat.executeUpdate(createMorphologyTableScript);
             stat.close();
-            writeAnalysis = conn.prepareStatement("insert into morphology values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            writeAnalysis = conn.prepareStatement(
+             "insert into morphology (form, lemma, grammaticalCase, degree, gender, mood, number, person, pos, tense, voice) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
         } catch (Exception e){
             throw new RuntimeException(e);
         }
@@ -149,7 +151,7 @@ public class DataRepository implements PersistenceStrategy {
         try {
 
             if (findAnalyses == null){
-                findAnalyses = conn.prepareStatement("SELECT * FROM morphology WHERE form = ?");
+                findAnalyses = conn.prepareStatement("SELECT form, lemma, grammaticalCase, degree, gender, mood, number, person, pos, tense, voice FROM morphology WHERE form = ?");
             }
             findAnalyses.setString(1, normalized);
             final ResultSet result = findAnalyses.executeQuery();
@@ -185,7 +187,7 @@ public class DataRepository implements PersistenceStrategy {
         final List<LexiconEntry> entries = new ArrayList<LexiconEntry>();
         try {
             if (findLexiconEntries == null){
-                findLexiconEntries = conn.prepareStatement("SELECT * FROM lexicon WHERE lemma = ?");
+                findLexiconEntries = conn.prepareStatement("SELECT lemma, ordinality, orthography, endings, gender, pos, definition FROM lexicon WHERE lemma = ?");
             }
             findLexiconEntries.setString(1, normalized);
             final ResultSet result = findLexiconEntries.executeQuery();

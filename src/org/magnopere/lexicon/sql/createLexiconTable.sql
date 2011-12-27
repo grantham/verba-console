@@ -25,7 +25,8 @@
 -- the provisions above, a recipient may use your version of this file
 -- under either the MPL or the [GPL] License.
 CREATE TABLE lexicon
-(lemma VARCHAR(250),
+(_id INTEGER PRIMARY KEY AUTOINCREMENT,
+ lemma VARCHAR(250),
  ordinality INTEGER,
  orthography VARCHAR(250),
  endings VARCHAR (250),
@@ -34,6 +35,6 @@ CREATE TABLE lexicon
  definition VARCHAR (1000)
 );
 
-CREATE INDEX lemma_index ON lexicon (lemma);
-CREATE INDEX pos_index ON lexicon (pos);
+CREATE INDEX lex_lemma_index ON lexicon (lemma);
+CREATE INDEX lex_pos_index ON lexicon (pos);
 

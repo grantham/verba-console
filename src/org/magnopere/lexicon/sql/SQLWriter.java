@@ -43,6 +43,10 @@ import static org.magnopere.lexicon.latin.Slurper.*;
  * @since 6/4/11
  */
 public class SQLWriter implements PersistenceStrategy {
+    
+    private static final String INSERT_ANALYSIS = "INSERT INTO morphology (form, lemma, grammaticalCase, degree, gender, mood, number, person, pos, tense, voice) VALUES ";
+    private static final String INSERT_LEX_ENTRY = "INSERT INTO lexicon (lemma, ordinality, orthography, endings, gender, pos, definition) VALUES ";
+    
     private final BufferedWriter    lexiconWriter;
     private final BufferedWriter    morphologyWriter;
 
@@ -65,7 +69,7 @@ public class SQLWriter implements PersistenceStrategy {
     public void buildLexiconTable() {
         try {
             lexiconWriter.write(createLexiconTableScript);
-            lexiconWriter.write("INSERT INTO lexicon VALUES ");
+            lexiconWriter.write(String.format("BEGIN TRANSACTION;%n"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -76,7 +80,7 @@ public class SQLWriter implements PersistenceStrategy {
         try {
 
             morphologyWriter.write(createMorphologyTableScript);
-            morphologyWriter.write("INSERT INTO morphology VALUES ");
+            morphologyWriter.write(String.format("BEGIN TRANSACTION;%n"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -84,15 +88,18 @@ public class SQLWriter implements PersistenceStrategy {
 
     @Override
     public void close() throws Exception {
+        lexiconWriter.write("END TRANSACTION;");
         lexiconWriter.flush();
         lexiconWriter.close();
+        morphologyWriter.write("END TRANSACTION;");
         morphologyWriter.flush();
         morphologyWriter.close();
     }
 
     @Override
     public void writeAnalysis(MorphologyAnalysis analysis) {
-        final String record = String.format("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'),%n",
+        final String record = String.format("%s (\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\");%n",
+                INSERT_ANALYSIS,
                 analysis.getForm(),
                 analysis.getLemma(),
                 analysis.getGrammaticalCase(),
@@ -113,14 +120,15 @@ public class SQLWriter implements PersistenceStrategy {
 
     @Override
     public void writeLexiconEntry(LexiconEntry entry) {
-        final String record = String.format("('%s', %d, '%s', '%s', '%s', '%s', '%s'),%n",
+        final String record = String.format("%s (\"%s\", \"%d\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\");%n",
+                INSERT_LEX_ENTRY,
                 entry.getKey(),
                 entry.getOrdinality(),
                 entry.getOrthography(),
                 entry.getiType(),
                 entry.getGender(),
                 entry.getPos(),
-                entry.getDefinition());
+                entry.getDefinition().replaceAll("[\"]", "[\']"));
         try {
             lexiconWriter.write(record);
         } catch (IOException e) {

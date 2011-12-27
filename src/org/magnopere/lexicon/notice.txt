@@ -4,9 +4,9 @@
 ;;;; Licensed under the Mozilla Public License 1.1
 ;;;;      see (http://www.mozilla.org/MPL/MPL-1.1.html).
 ;;;;
-;;;; Source available at:
+;;;; Source is available at:
 ;;;;
-;;;;
+;;;;        https://github.com/grantham/verba-console
 ;;;;
 ;;;; Welcome to the Verba Latin-English dictionary, based on the public
 ;;;; domain dictionary:
