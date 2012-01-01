@@ -59,9 +59,14 @@ In order to build, you'll need:
 
 1. call:
 
-        $ ant -Dinstallation.dir=/path/to/installation/dir install
+        $ ant -Dinstallation.dir=/home/you/bin/verba-1.0.0 -Dproject.version=1.0.0 install
 
 This will build the jar, a script to start the application, and the database.
+
+Both of the `-D` parameters are optional:
+
+- if `installation.dir` is not specified, `install` will create a `./verba-installation` directory and install there.
+- if `project.version` us bit specified, the current version + _-SNAPSHOT- is used.
 
 
 ## Installing
@@ -71,7 +76,7 @@ Simply run the ant `install` target, passing in the path to the desired installa
 
         $ ant -Dinstallation.dir=/path/to/installation/dir install
 
-### From pre-build binaries
+### From pre-built binaries
 Download the distribution zip file from [http://www.magnopere.org](http://www.magnopere.org) and unzip in your preferred
 location.
 

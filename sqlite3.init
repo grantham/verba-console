@@ -1,4 +1,6 @@
 .echo OFF
+CREATE TABLE "android_metadata" ("locale" TEXT DEFAULT 'en_US');
+INSERT INTO "android_metadata" VALUES ('en_US');
 .read ./generated/lexicon.sql
 .read ./generated/morphology.sql
 .quit
