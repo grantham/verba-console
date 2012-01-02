@@ -32,7 +32,7 @@ CREATE TABLE lexicon
  endings VARCHAR (250),
  gender VARCHAR (4)  CHECK (gender in ("", "fem", "masc", "neut")),
  pos VARCHAR (10)  CHECK (pos in ("", "adj", "adv", "adverbial", "conj", "exclam", "noun", "numeral", "part", "prep", "pron", "verb", "dep")),
- definition VARCHAR (1000)
+ definition BLOB
 );
 
 CREATE INDEX lex_lemma_index ON lexicon (lemma);

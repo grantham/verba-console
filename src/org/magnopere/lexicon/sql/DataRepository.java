@@ -199,7 +199,7 @@ public class DataRepository implements PersistenceStrategy {
                 entry.setiType(result.getString("endings"));
                 entry.setGender(result.getString("gender"));
                 entry.setPos(result.getString("pos"));
-                entry.setDefinition(result.getString("definition"));
+                entry.setDefinition(Compression.deflateToString(result.getBytes("definition")));
                 entries.add(entry);
             }
             result.close();
@@ -242,7 +242,7 @@ public class DataRepository implements PersistenceStrategy {
             writeLexiconEntry.setString(4, entry.getiType());
             writeLexiconEntry.setString(5, entry.getGender());
             writeLexiconEntry.setString(6, entry.getPos());
-            writeLexiconEntry.setString(7, entry.getDefinition());
+            writeLexiconEntry.setBlob(7, Compression.toCompressedInputStream(entry.getDefinition()));
             writeLexiconEntry.execute();
         } catch (Exception e){
             throw new RuntimeException(e);

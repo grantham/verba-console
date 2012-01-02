@@ -32,10 +32,8 @@ package org.magnopere.lexicon.sql;
 import org.magnopere.lexicon.latin.LexiconEntry;
 import org.magnopere.lexicon.latin.MorphologyAnalysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+
 import static org.magnopere.lexicon.latin.Slurper.*;
 
 /**
@@ -96,6 +94,7 @@ public class SQLWriter implements PersistenceStrategy {
         morphologyWriter.close();
     }
 
+
     @Override
     public void writeAnalysis(MorphologyAnalysis analysis) {
         final String record = String.format("%s (\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\");%n",
@@ -120,7 +119,7 @@ public class SQLWriter implements PersistenceStrategy {
 
     @Override
     public void writeLexiconEntry(LexiconEntry entry) {
-        final String record = String.format("%s (\"%s\", \"%d\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\");%n",
+        final String record = String.format("%s (\"%s\", \"%d\", \"%s\", \"%s\", \"%s\", \"%s\", X\'%s\');%n",
                 INSERT_LEX_ENTRY,
                 entry.getKey(),
                 entry.getOrdinality(),
@@ -128,7 +127,7 @@ public class SQLWriter implements PersistenceStrategy {
                 entry.getiType(),
                 entry.getGender(),
                 entry.getPos(),
-                entry.getDefinition().replaceAll("[\"]", "[\']"));
+                Compression.toCompressedHex(entry.getDefinition()));
         try {
             lexiconWriter.write(record);
         } catch (IOException e) {
